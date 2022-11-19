@@ -1,4 +1,5 @@
 import { prisma } from "@/config";
+import { Ticket } from "@prisma/client";
 
 async function getTicketTypesRepository() {
   return await prisma.ticketType.findMany();
@@ -15,13 +16,9 @@ async function searchUserTicket(enrollmentId: number) {
   });
 }
 
-async function insertTicket(enrollmentId: number, ticketTypeId: number) {
+async function insertTicket(obj: Omit<Ticket, "id" | "createdAt" | "updatedAt">) {
   return prisma.ticket.create({
-    data: {
-      enrollmentId,
-      ticketTypeId,
-      status: "RESERVED"
-    },
+    data: obj,
     include: {
       TicketType: true
     }

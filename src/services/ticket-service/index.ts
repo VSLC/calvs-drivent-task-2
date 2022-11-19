@@ -1,6 +1,7 @@
 import ticketRepository from "@/repositories/ticket-repository";
 import enrollmentRepository from "@/repositories/enrollment-repository";
 import { notFoundError } from "@/errors";
+import { Ticket } from "@prisma/client";
 
 async function getTicketsTypesServices() {
   const getTicketsTypes = await ticketRepository.getTicketTypesRepository();
@@ -24,7 +25,8 @@ async function postTicket(userId: number, ticketTypeId: number) {
   if (!enrollment) {
     throw notFoundError();
   }
-  const insertNewTicket = await ticketRepository.insertTicket(enrollment.id, ticketTypeId);
+  const obj: Omit<Ticket, "id" | "createdAt" | "updatedAt"> = { enrollmentId: enrollment.id, ticketTypeId, status: "RESERVED" };
+  const insertNewTicket = await ticketRepository.insertTicket(obj);
   return insertNewTicket;
 }
 
