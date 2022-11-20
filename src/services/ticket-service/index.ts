@@ -8,34 +8,37 @@ async function getTicketsTypesServices() {
   return getTicketsTypes;
 }
 
+async function getTickets(userId: number) {
+  const confirmedEnrollment = await confirmEnrollment(userId);
+
+  const tickets = await ticketRepository.searchUserTicket(confirmedEnrollment.id);
+  if (!tickets) {
+    throw notFoundError();
+  }
+  return tickets;
+}
+
+async function postTicket(userId: number, ticketTypeId: number) {
+  const confirmedEnrollment = await confirmEnrollment(userId);
+  const newTicketObject: Omit<Ticket, "id" | "createdAt" | "updatedAt"> = { enrollmentId: confirmedEnrollment.id, ticketTypeId, status: "RESERVED" };
+  const insertNewTicket = await ticketRepository.insertTicket(newTicketObject);
+  return insertNewTicket;
+}
+
+async function confirmEnrollment(userId: number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) {
+    throw notFoundError();
+  }
+  return enrollment;
+}
+
 export async function validateEnrollment(userId: number) {
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) {
     return null;
   }
   return enrollment.id;
-}
-
-async function getTickets(userId: number) {
-  const getUserEnrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-  if (!getUserEnrollment) {
-    throw notFoundError();
-  }
-  const getUserTickets = await ticketRepository.searchUserTicket(getUserEnrollment.id);
-  if (getUserTickets.length === 0) {
-    throw notFoundError();
-  }
-  return getUserTickets;
-}
-
-async function postTicket(userId: number, ticketTypeId: number) {
-  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-  if (!enrollment) {
-    throw notFoundError();
-  }
-  const obj: Omit<Ticket, "id" | "createdAt" | "updatedAt"> = { enrollmentId: enrollment.id, ticketTypeId, status: "RESERVED" };
-  const insertNewTicket = await ticketRepository.insertTicket(obj);
-  return insertNewTicket;
 }
 
 const ticketService = {

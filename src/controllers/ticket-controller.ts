@@ -15,8 +15,8 @@ export async function getTicketTypes(req: AuthenticatedRequest, res: Response) {
 export async function getTicketsByUser(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   try {
-    const findUserTickets = await ticketService.getTickets(userId);
-    return res.status(httpStatus.OK).send(findUserTickets[0]);
+    const findUserTicket = await ticketService.getTickets(userId);
+    return res.status(httpStatus.OK).send(findUserTicket);
   } catch (error) {
     return res.sendStatus(httpStatus.NOT_FOUND);
   }
