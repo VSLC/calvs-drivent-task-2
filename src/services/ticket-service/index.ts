@@ -8,6 +8,14 @@ async function getTicketsTypesServices() {
   return getTicketsTypes;
 }
 
+export async function validateEnrollment(userId: number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) {
+    return null;
+  }
+  return enrollment.id;
+}
+
 async function getTickets(userId: number) {
   const getUserEnrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!getUserEnrollment) {

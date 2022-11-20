@@ -25,9 +25,33 @@ async function insertTicket(obj: Omit<Ticket, "id" | "createdAt" | "updatedAt">)
   });
 }
 
+async function findTicketById(ticketId: number) {
+  return prisma.ticket.findUnique({
+    where: {
+      id: ticketId
+    },
+    include: {
+      TicketType: true
+    }
+  });
+}
+
+async function updateStatus(ticketId: number) {
+  return prisma.ticket.update({
+    where: {
+      id: ticketId
+    },
+    data: {
+      status: "PAID"
+    }
+  });
+}
+
 const ticketRepository = {
   getTicketTypesRepository,
   searchUserTicket,
-  insertTicket
+  insertTicket,
+  findTicketById,
+  updateStatus
 };
 export default ticketRepository;
